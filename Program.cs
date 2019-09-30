@@ -93,11 +93,9 @@ namespace treeproject
                 else if (value > currentNode.value) {
                     currentNode.right = insert(currentNode.right, value);
                 }
-                /*
                 else {      // value == currentNode.value
-                    currentNode.value = value;
+                    Console.WriteLine("Error: Did not insert {0}, already present in tree\n", newValue);
                 }
-                */
             }
             else {      // treeNode == null
                 currentNode.value = value;
@@ -106,8 +104,19 @@ namespace treeproject
             return currentNode;
         }
 
+        static public void printBinTree(Node treeNode) {
+            if (treeNode != null) {
+                Console.WriteLine("{0}", treeNode.value);
+                printBinTree(treeNode.left);
+                printBinTree(treeNode.right);
+            }
+            else {      // treeNode == null
+                Console.WriteLine("N");
+            }
+        }
+
         static public Node delete(Node rootNode, int value) {
-            Console.WriteLine("Delete node with value: {0}", value);
+            Console.WriteLine("Deleting node with value {0} starting at node {1}", value, rootNode.value);
 
             if (rootNode != null) {
                 if (value != rootNode.value) {
@@ -189,7 +198,7 @@ namespace treeproject
         }
 
         static public Node findParentNode(Node rootNode, int value) {
-            Console.WriteLine("Find parent of node with value: {0}", value);
+            Console.WriteLine("Finding parent of node with value {0} => {1}", value, rootNode.value);
             Node currentNode = rootNode;
             Stack<Node> nodeStack = new Stack<Node>();
 
@@ -209,24 +218,28 @@ namespace treeproject
                     }
                 }
                 else {      // value == rootNode.value
-                    Console.WriteLine("Value is {0}", rootNode.value);
+                    Console.WriteLine("Value at current node equals {0}", rootNode.value);
                     return rootNode;
                 }
             }
 
             if (currentNode != null) {
-                Console.WriteLine("Value is {0}", currentNode.value);
+                Console.WriteLine("Value at current node equals {0}", currentNode.value);
+            }
+            else {
+                Console.WriteLine("Error: {0} not in tree", value);
             }
 
             return currentNode;
         }
 
         static public Node findMinNode(Node treeNode) {
-            Console.WriteLine("Find min tree node");
             Node currentNode = treeNode;
+            Console.WriteLine("Finding min tree node => {0}", currentNode.value);
 
             while (currentNode.left != null) {
                 currentNode = currentNode.left;
+                Console.WriteLine("Finding min tree node => {0}", currentNode.value);
             }
             Console.WriteLine("Found: {0}", currentNode.value);
 
@@ -234,11 +247,12 @@ namespace treeproject
         }
 
         static public Node findMaxNode(Node treeNode) {
-            Console.WriteLine("Find max tree node");
             Node currentNode = treeNode;
+            Console.WriteLine("Finding max tree node => {0}", currentNode.value);
 
             while (currentNode.right != null) {
                 currentNode = currentNode.right;
+                Console.WriteLine("Finding max tree node => {0}", currentNode.value);
             }
             Console.WriteLine("Found: {0}", currentNode.value);
 
@@ -318,17 +332,6 @@ namespace treeproject
         static public void printTreeList(List<string> treeList) {
             foreach (string value in treeList) {
                 Console.WriteLine("{0}", value);
-            }
-        }
-
-        static public void printBinTree(Node treeNode) {
-            if (treeNode != null) {
-                Console.WriteLine("{0}", treeNode.value);
-                printBinTree(treeNode.left);
-                printBinTree(treeNode.right);
-            }
-            else {      // treeNode == null
-                Console.WriteLine("N");
             }
         }
     }
