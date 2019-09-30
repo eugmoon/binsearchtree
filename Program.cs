@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
 
-namespace treeproject
+namespace binseatreecs
 {
     class Node {
         public int value { get; set; }
@@ -79,6 +81,8 @@ namespace treeproject
             Console.WriteLine("\nOutput binary search tree: testTree");
             printBinTree(testTree);
             Console.WriteLine("Done!\n");
+            
+            BuildWebHost(args).Run();
         }
 
         static public Node insert(Node treeNode, int value) {
@@ -334,5 +338,10 @@ namespace treeproject
                 Console.WriteLine("{0}", value);
             }
         }
+
+        public static IWebHost BuildWebHost(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .Build();
     }
 }
