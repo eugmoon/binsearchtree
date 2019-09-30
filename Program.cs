@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace treeproject
@@ -70,7 +70,7 @@ namespace treeproject
 
             /*
             */
-            List<int> testList = serialize(root);
+            List<string> testList = serialize(root);
             Console.WriteLine("\nOutput serialized binary search tree: testList");
             printTreeList(testList);
             Console.WriteLine("Done!\n");
@@ -109,64 +109,80 @@ namespace treeproject
         static public Node delete(Node rootNode, int value) {
             Console.WriteLine("Delete node with value: {0}", value);
 
-            if (value != rootNode.value) {
-                Node parentNode = findParentNode(rootNode, value);
+            if (rootNode != null) {
+                if (value != rootNode.value) {
+                    Node parentNode = findParentNode(rootNode, value);
 
-                if (parentNode != null) {     // found parent node
-                    Node currentNode = new Node();
-                    if (value < parentNode.value) {    // currentNode is left child of parent node
-                        currentNode = parentNode.left;
+                    if (parentNode != null) {     // found parent node
+                        Node currentNode = new Node();
+                        if (value < parentNode.value) {    // currentNode is left child of parent node
+                            currentNode = parentNode.left;
 
-                        if (currentNode.left == null) {     // currentNode has only right child or no children
-                            parentNode.left = currentNode.right;
-                        }
-                        else if (currentNode.right == null) {   // currentNode has no right child
-                            parentNode.left = currentNode.left;
-                        }
-                        else {      // currentNode has two children
-                            Node replaceNode = findMaxNode(currentNode.left);
-                            currentNode.value = replaceNode.value;
-                            if (replaceNode == currentNode.left) {  // replaceNode is child of currentNode
-                                currentNode.left = null;
+                            if (currentNode.left == null) {     // currentNode has only right child or no children
+                                parentNode.left = currentNode.right;
                             }
-                            else {      // replaceNode is descendant of currentNode
-                                findParentNode(currentNode.left, replaceNode.value).right = null;
+                            else if (currentNode.right == null) {   // currentNode has no right child
+                                parentNode.left = currentNode.left;
+                            }
+                            else {      // currentNode has two children
+                                Node replaceNode = findMaxNode(currentNode.left);
+                                currentNode.value = replaceNode.value;
+                                if (replaceNode == currentNode.left) {  // replaceNode is child of currentNode
+                                    currentNode.left = null;
+                                }
+                                else {      // replaceNode is descendant of currentNode
+                                    findParentNode(currentNode.left, replaceNode.value).right = null;
+                                }
+                            }
+                        }
+                        else if (value > parentNode.value) {     // currentNode is right child of parent node
+                            currentNode = parentNode.right;
+
+                            if (currentNode.left == null) {     // currentNode has only right child or no children
+                                parentNode.right = currentNode.right;
+                            }
+                            else if (currentNode.right == null) {   // currentNode has no right child
+                                parentNode.right = currentNode.left;
+                            }
+                            else {      // currentNode has two children
+                                Node replaceNode = findMinNode(currentNode.right);
+                                currentNode.value = replaceNode.value;
+                                if (replaceNode == currentNode.right) {     // replaceNode is child of currentNode
+                                    currentNode.right = null;
+                                }
+                                else {      // replaceNode is descendant of currentNode
+                                    findParentNode(currentNode.right, replaceNode.value).left = null;
+                                }
                             }
                         }
                     }
-                    else if (value > parentNode.value) {     // currentNode is right child of parent node
-                        currentNode = parentNode.right;
-
-                        if (currentNode.left == null) {     // currentNode has only right child or no children
-                            parentNode.right = currentNode.right;
+                }
+                else {      // delete root node
+                    if (rootNode.left != null) {
+                        Node replaceNodeL = findMaxNode(rootNode.left);
+                        replaceNodeL.left = rootNode.left;
+                        replaceNodeL.right = rootNode.right;
+                        if (replaceNodeL.value == rootNode.left.value) {
+                            replaceNodeL.left = null;
                         }
-                        else if (currentNode.right == null) {   // currentNode has no right child
-                            parentNode.right = currentNode.left;
+                        else {
+                            findParentNode(rootNode.left, replaceNodeL.value).right = null;
                         }
-                        else {      // currentNode has two children
-                            Node replaceNode = findMinNode(currentNode.right);
-                            currentNode.value = replaceNode.value;
-                            if (replaceNode == currentNode.right) {     // replaceNode is child of currentNode
-                                currentNode.right = null;
-                            }
-                            else {      // replaceNode is descendant of currentNode
-                                findParentNode(currentNode.right, replaceNode.value).left = null;
-                            }
+                        return replaceNodeL;
+                    }
+                    else if (rootNode.right != null) {
+                        Node replaceNodeR = findMaxNode(rootNode.right);
+                        replaceNodeR.left = rootNode.left;
+                        replaceNodeR.right = rootNode.right;
+                        if (replaceNodeR.value == rootNode.right.value) {
+                            replaceNodeR.right = null;
                         }
+                        else {
+                            findParentNode(rootNode.right, replaceNodeR.value).left = null;
+                        }
+                        return replaceNodeR;
                     }
                 }
-            }
-            else {      // delete root node
-                Node replaceNode = findMaxNode(rootNode.left);
-                replaceNode.left = rootNode.left;
-                replaceNode.right = rootNode.right;
-                if (replaceNode.value == rootNode.left.value) {
-                    replaceNode.left = null;
-                }
-                else {
-                    findParentNode(rootNode.left, replaceNode.value).right = null;
-                }
-                return replaceNode;
             }
 
             return rootNode;
@@ -247,7 +263,7 @@ namespace treeproject
                             currentNode = parentNode;
                         }
                     }
-                    else {      // parent node not found
+                    else {      // parent node not found (== null)
                         return parentNode;
                     }
                 }
@@ -262,27 +278,27 @@ namespace treeproject
             return currentNode;
         }
 
-        static public List<int> serialize(Node treeNode) {
-            List<int> serialList = new List<int>();
+        static public List<string> serialize(Node treeNode) {
+            List<string> serialList = new List<string>();
 
             if (treeNode != null) {     // add treeNode value to list (pre-order traversal)
-                serialList.Add(treeNode.value);
+                serialList.Add(treeNode.value.ToString());
                 serialList.AddRange(serialize(treeNode.left));
                 serialList.AddRange(serialize(treeNode.right));
             }
-            else {      // treeNode == null, add sentinel value (-1)
-                serialList.Insert(0, -1);
+            else {      // treeNode == null, add sentinel value (N)
+                serialList.Insert(0, "N");
             }
 
             return serialList;
         }
 
-        static public Node deserialize(List<int> treeList) {
+        static public Node deserialize(List<string> treeList) {
             Node tempNode = new Node();
 
             if (treeList.Count != 0) {
-                if (treeList[0] != -1) {    // treeList not empty
-                    tempNode.value = treeList[0];
+                if (treeList[0] != "N") {    // treeList not empty
+                    tempNode.value = Convert.ToInt16(treeList[0]);
                     treeList.RemoveAt(0);
                     tempNode.left = deserialize(treeList);
                     treeList.RemoveAt(0);
@@ -299,8 +315,8 @@ namespace treeproject
             return tempNode;
         }
 
-        static public void printTreeList(List<int> treeList) {
-            foreach (int value in treeList) {
+        static public void printTreeList(List<string> treeList) {
+            foreach (string value in treeList) {
                 Console.WriteLine("{0}", value);
             }
         }
@@ -312,7 +328,7 @@ namespace treeproject
                 printBinTree(treeNode.right);
             }
             else {      // treeNode == null
-                Console.WriteLine("-1");
+                Console.WriteLine("N");
             }
         }
     }
