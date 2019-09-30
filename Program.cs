@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace binseatreecs
+namespace binsearchtree
 {
     class Node {
         public int value { get; set; }
