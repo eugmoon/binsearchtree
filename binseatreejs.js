@@ -3,8 +3,6 @@ class NODE {
         this.value = value;
         this.left = null;
         this.right = null;
-        this.next = null;
-        this.previous = null;
     }
 
     insert(node, newValue) {
@@ -29,85 +27,183 @@ class NODE {
         }
     }
 
-    printBinTree(node) {
+    inOrderIterate(node) {
+        var currNode = node;
+        var stack = new STACK();
+
+        do {
+            while (currNode != null) {
+                stack.push(currNode);
+                if (currNode.left == null)
+                    console.log("N");   // left Null
+                currNode = currNode.left;
+            }
+
+            if (!stack.isEmpty()) {
+                currNode = stack.pop();
+                console.log(currNode.value);
+                if (currNode.right == null)
+                    console.log("N");   // right Null
+                currNode = currNode.right;
+            }
+        } while (currNode != null || !stack.isEmpty())
+    }
+
+    postOrderIterate(node) {
+        var currNode = node;
+        var prevNode = null;
+        var stack = new STACK();
+
+        do {
+            while (currNode != null) {
+                stack.push(currNode);
+                if (currNode.left == null)
+                    console.log("N");   // left Null
+                currNode = currNode.left;
+            }
+
+            if (currNode == null && !stack.isEmpty()) {
+                currNode = stack.pop();
+                if (currNode.right == null || currNode.right == prevNode) {
+                    if (currNode.right == null)
+                        console.log("N");   // right Null
+                    console.log(currNode.value);
+                    prevNode = currNode;
+                    currNode = null;
+                }
+                else {
+                    stack.push(currNode);
+                    currNode = currNode.right;
+                }
+            }
+        } while (!stack.isEmpty())
+    }
+
+    preOrderIterate(node) {
+        var currNode = node;
+        var stack = new STACK();
+
+        do {
+            while (currNode != null) {
+                stack.push(currNode);
+                console.log(currNode.value);
+                if (currNode.left == null)
+                    console.log("N");  // left Null
+                currNode = currNode.left
+            }
+
+            if (!stack.isEmpty()) {
+                currNode = stack.pop();
+                if (currNode.right == null)
+                    console.log("N");  // right Null
+                currNode = currNode.right;
+            }
+        } while (currNode != null || !stack.isEmpty())
+    }
+
+    recurseTree(node, order) {
         if (node != null) {
-            console.log(node.value);
-            this.printBinTree(node.left);
-            this.printBinTree(node.right);
+            if (order == "in") {
+                this.recurseTree(node.left, order);
+                console.log(node.value);
+                this.recurseTree(node.right, order);
+            }
+            else if (order == "post") {
+                this.recurseTree(node.left, order);
+                this.recurseTree(node.right, order);
+                console.log(node.value);
+            }
+            else if (order == "pre") {
+                console.log(node.value);
+                this.recurseTree(node.left, order);
+                this.recurseTree(node.right, order);
+            }
         }
         else {
-            console.log("-1");
+            console.log("N");
         }
     }
 
     delete(rootNode, value) {
-        console.log("Delete node with value: " + value);
+        console.log("Delete node with value: " + value + "\n");
 
-        if (value != rootNode.value) {
-            var parentNode = this.findParentNode(rootNode, value);
-
-            if (parentNode != null) {
-                var currentNode = null;
-                if (value < parentNode.value) {
-                    currentNode = parentNode.left;
+        if (rootNode != null) {
+            if (value != rootNode.value) {
+                var parentNode = this.findParentNode(rootNode, value);
     
-                    if (currentNode.left == null) {
-                        parentNode.left = currentNode.right;
-                    }
-                    else if (currentNode.right == null) {
-                        parentNode.left = currentNode.left;
-                    }
-                    else {      // currentNode has two children
-                        var replaceNode = this.findMaxNode(currentNode.left);
-                        currentNode.value = replaceNode.value;
-                        if (replaceNode == currentNode.left) {
-                            currentNode.left = null;
+                if (parentNode != null) {
+                    var currentNode = null;
+                    if (value < parentNode.value) {
+                        currentNode = parentNode.left;
+        
+                        if (currentNode.left == null) {
+                            parentNode.left = currentNode.right;
                         }
-                        else {
-                            this.findParentNode(currentNode.left, replaceNode.value).right = null;
+                        else if (currentNode.right == null) {
+                            parentNode.left = currentNode.left;
+                        }
+                        else {      // currentNode has two children
+                            var replaceNode = this.findMaxNode(currentNode.left);
+                            currentNode.value = replaceNode.value;
+                            if (replaceNode == currentNode.left) {
+                                currentNode.left = null;
+                            }
+                            else {
+                                this.findParentNode(currentNode.left, replaceNode.value).right = null;
+                            }
+                        }
+                    }
+                    else if (value > parentNode.value) {
+                        currentNode = parentNode.right;
+        
+                        if (currentNode.left == null) {
+                            parentNode.right = currentNode.right;
+                        }
+                        else if (currentNode.right == null) {
+                            parentNode.right = currentNode.left;
+                        }
+                        else {      // currentNode has two children
+                            var replaceNode = this.findMinNode(currentNode.right);
+                            currentNode.value = replaceNode.value;
+                            if (replaceNode == currentNode.right) {
+                                currentNode.right = null;
+                            }
+                            else {
+                                this.findParentNode(currentNode.right, replaceNode.value).left = null;
+                            }
                         }
                     }
                 }
-                else if (value > parentNode.value) {
-                    currentNode = parentNode.right;
+            }
+            else {      // delete root node
+                var replaceNode = null;
     
-                    if (currentNode.left == null) {
-                        parentNode.right = currentNode.right;
+                if (rootNode.left != null) {
+                    replaceNode = this.findMaxNode(rootNode.left);
+                    if (replaceNode.value != rootNode.left.value) {
+                        this.findParentNode(rootNode.left, replaceNode.value).right = null;
+                        replaceNode.left = rootNode.left;
                     }
-                    else if (currentNode.right == null) {
-                        parentNode.right = currentNode.left;
-                    }
-                    else {      // currentNode has two children
-                        var replaceNode = this.findMinNode(currentNode.right);
-                        currentNode.value = replaceNode.value;
-                        if (replaceNode == currentNode.right) {
-                            currentNode.right = null;
-                        }
-                        else {
-                            this.findParentNode(currentNode.right, replaceNode.value).left = null;
-                        }
-                    }
+                    replaceNode.right = rootNode.right;
                 }
+                else if (rootNode.right != null) {
+                    replaceNode = this.findMaxNode(rootNode.right);
+                    if (replaceNode.value == rootNode.right.value) {
+                        this.findParentNode(rootNode.right, replaceNode.value).left = null;
+                        replaceNode.left = rootNode.left;
+                    }
+                    replaceNode.left = rootNode.left;
+                }
+    
+                return replaceNode;
             }
-        }
-        else {      // delete root node
-            var replaceNode = this.findMaxNode(rootNode.left);
-            replaceNode.left = rootNode.left;
-            replaceNode.right = rootNode.right;
-            if (replaceNode.value == rootNode.left.value) {
-                replaceNode.left = null;
-            }
-            else {
-                this.findParentNode(rootNode.left, replaceNode.value).right = null;
-            }
-            return replaceNode;
         }
 
         return rootNode;
     }
 
     findParentNode(rootNode, value) {
-        console.log("Find parent of node with value: " + value);
+        console.log("Find parent of node with value: " + value + "\n");
         var currentNode = rootNode;
         var nodeStack = new STACK();
 
@@ -127,38 +223,38 @@ class NODE {
                 }
             }
             else {      // value == rootNode.value
-                console.log("Value is " + rootNode.value);
+                console.log("Value is " + rootNode.value + "\n");
                 return rootNode;
             }
         }
 
         if (currentNode != null) {
-            console.log("Value is " + currentNode.value);
+            console.log("Value is " + currentNode.value + "\n");
         }
 
         return currentNode;
     }
 
     findMinNode(treeNode) {
-        console.log("Find min tree node");
+        console.log("Find min tree node\n");
         var currentNode = treeNode;
 
         while (currentNode.left != null) {
             currentNode = currentNode.left;
         }
-        console.log("Found: " + currentNode.value);
+        console.log("Found: " + currentNode.value + "\n");
 
         return currentNode;
     }
 
     findMaxNode(treeNode) {
-        console.log("Find max tree node");
+        console.log("Find max tree node\n");
         var currentNode = treeNode;
 
         while (currentNode.right != null) {
             currentNode = currentNode.right;
         }
-        console.log("Found: " + currentNode.value);
+        console.log("Found: " + currentNode.value + "\n");
 
         return currentNode;
     }
@@ -195,102 +291,80 @@ class NODE {
 
         return currentNode;
     }
+}
 
-    serialize(nodeQueue, rootNode) {
-        var serialQueue = nodeQueue;
-        var serialNode = null;
-
-        if (rootNode != null) {     // rootNode not empty
-            serialNode = new NODE(rootNode.value);
-            serialQueue.enqueue(serialNode);
-            this.serialize(serialQueue, rootNode.left);
-            this.serialize(serialQueue, rootNode.right);
-        }
-        else {      // rootNode is empty (null)
-            serialNode = new NODE(-1);
-            serialQueue.enqueue(serialNode);
-        }
-
-        return serialQueue;
-    }
-
-    deserialize(nodeQueue) {
-        var serialQueue = nodeQueue;
-        var serialNode = null;
-
-        if (nodeQueue != null) {    // nodeQueue not empty
-            serialNode = serialQueue.dequeue();
-
-            if (serialNode.value != -1) {   // nodeQueue first node not -1
-                serialNode.left = this.deserialize(serialQueue);
-                serialNode.right = this.deserialize(serialQueue);
-            }
-            else {      // nodeQueue first node has value -1 (empty sentinel)
-                serialNode = null;
-            }
-        }
-        else {      // nodeQueue is empty
-            serialNode = null;
-        }
-        
-        return serialNode;
+class STAQ {
+    constructor(node) {
+        this.node = node;
+        this.next = null;
+        this.previous = null;
     }
 }
 
 class STACK {
     constructor() {
-        this.root = null;
+        this.top = null;
     }
 
     push(node) {
-        if (node != null) {
-            node.next = this.root;
-            this.root = node;
+        var stackNode = new STAQ(node);
+        // stackNode.next = null;
+        if (this.top != null) {
+            stackNode.next = this.top;
         }
+        this.top = stackNode;
     }
 
     pop() {
-        var popNode = this.root;
+        var stackNode = this.top;
 
-        if (popNode != null) {
-            if (popNode.next != null) {
-                this.root = popNode.next;
+        if (stackNode != null) {
+            if (stackNode.next != null) {
+                this.top = stackNode.next;
             }
             else {
-                this.root = null;
+                this.top = null;
             }
         }
 
-        return popNode;
+        return stackNode.node;
     }
 
     peek() {
-        var peekNode = this.root;
+        var stackNode = this.top;
 
-        if (peekNode != null) {
-            return peekNode.value;
-        }
+        if (stackNode != null)
+            return stackNode.node;
 
-        return "Stack is empty!";
+        return stackNode;
+    }
+
+    isEmpty() {
+        return (this.peek() == null);
     }
 }
 
 class QUEUE {
     constructor() {
         this.front = null;
-        this.end = null;
+        this.back = null;
     }
 
     enqueue(node) {
         if (node != null) {
-            if (this.end != null) {
-                node.previous = this.end;
-                this.end.next = node;
-                this.end = node;
+            var queueNode = new STAQ(node);
+            /*
+            queueNode.previous = null;
+            queueNode.next = null;
+            */
+            if (this.back != null) {
+                queueNode.previous = this.back;
+                this.back.next = queueNode;
+                this.back = queueNode;
             }
             else {
-                this.end = node;
-                this.front = node;
+                this.front = queueNode;
+                this.back = queueNode;
             }
         }
     }
@@ -300,18 +374,16 @@ class QUEUE {
 
         if (frontNode != null) {
             if (frontNode.next != null) {
-                var tempNode = frontNode.next;
-                tempNode.previous = null;
-                this.front = tempNode;
+                var queueNode = frontNode.next;
+                queueNode.previous = null;
+                this.front = queueNode;
             }
             else {
-                frontNode = this.front;
+                this.back = null;
                 this.front = null;
-                this.end = null;
             }
-        }
-        else {
-            return "Queue is empty!";
+
+            return frontNode.node;
         }
 
         return frontNode;
@@ -321,63 +393,108 @@ class QUEUE {
         var currentNode = this.front;
 
         while (currentNode != null) {
-            console.log(currentNode.value);
+            console.log(currentNode.node.value);
             currentNode = currentNode.next;
         }
         console.log("");
     }
+
+    serialize(rootNode) {
+        if (rootNode != null) {     // rootNode not empty
+            this.enqueue(rootNode);
+            this.serialize(rootNode.left);
+            this.serialize(rootNode.right);
+        }
+        else {      // rootNode is empty (null)
+            var leafNode = new NODE('N');
+            this.enqueue(leafNode);
+        }
+
+        return this;
+    }
+
+    deserialize() {
+        var treeNode = null;
+
+        if (this.front != null) {    // Queue not empty
+            treeNode = this.dequeue();
+
+            if (treeNode.value != 'N') {   // Queue first node not 'N'
+                treeNode.left = this.deserialize();
+                treeNode.right = this.deserialize();
+            }
+            else {      // Queue first node has value 'N' (empty sentinel)
+                treeNode = null;
+            }
+        }
+        else {      // Queue is empty
+            treeNode = null;
+        }
+        
+        return treeNode;
+    }
 }
 
-var root = new NODE(20);
-root.insert(root, 8);
-root.insert(root, 22);
-root.insert(root, 20);      // insert repeated
-root.insert(root, 4);
-root.insert(root, 12);
-root.insert(root, 5);
-root.insert(root, 8);       // insert repeated
-root.insert(root, 10);
-root.insert(root, 14);
-root.insert(root, 22);      // insert repeated
+function main() {
+    var root = new NODE(20);
+    root.insert(root, 8);
+    root.insert(root, 22);
+    root.insert(root, 20);      // insert repeated
+    root.insert(root, 4);
+    root.insert(root, 12);
+    root.insert(root, 5);
+    root.insert(root, 8);       // insert repeated
+    root.insert(root, 10);
+    root.insert(root, 14);
+    root.insert(root, 22);      // insert repeated
+    
+    var order = "pre";          // or "post" or "in"
+    root.recurseTree(root, order);
+    console.log("");
+    
+    root = root.delete(root, 20);
+    
+    root.recurseTree(root, order);
+    console.log("");
+    
+    if (root.findTreeNode(root, 29) != null) {
+        console.log("Success!\n");
+    }
+    else {
+        console.log("Failed!\n");
+    }
+    
+    if (root.findTreeNode(root, 5) != null) {
+        console.log("Success!\n");
+    }
+    else {
+        console.log("Failed!\n");
+    }
+    
+    if (root.findParentNode(root, 20)!= null) {
+        console.log("Success!\n");
+    }
+    else {
+        console.log("Failed!\n");
+    }
+    
+    if (root.findParentNode(root, 14)!= null) {
+        console.log("Success!\n");
+    }
+    else {
+        console.log("Failed!\n");
+    }
+    
+    var treeQueue = new QUEUE();
+    treeQueue = treeQueue.serialize(root);
+    
+    treeQueue.printQueue();
+    
+    var treeNode = treeQueue.deserialize();
+    treeNode.recurseTree(treeNode, order);
+    console.log("");
 
-root.printBinTree(root);
-console.log("");
-
-root = root.delete(root, 20);
-
-root.printBinTree(root);
-console.log("");
-
-if (root.findTreeNode(root, 29) != null) {
-    console.log("Success!\n");
-} else {
-    console.log("Failed!\n");
+    return 0;
 }
 
-if (root.findTreeNode(root, 5) != null) {
-    console.log("Success!\n");
-} else {
-    console.log("Failed!\n");
-}
-
-if (root.findParentNode(root, 20)!= null) {
-    console.log("Success!\n");
-} else {
-    console.log("Failed!\n");
-}
-
-if (root.findParentNode(root, 14)!= null) {
-    console.log("Success!\n");
-} else {
-    console.log("Failed!\n");
-}
-console.log("");
-
-var treeQueue = new QUEUE();
-treeQueue = root.serialize(treeQueue, root);
-
-treeQueue.printQueue();
-
-var treeNode = root.deserialize(treeQueue);
-treeNode.printBinTree(treeNode);
-console.log("");
+main();
